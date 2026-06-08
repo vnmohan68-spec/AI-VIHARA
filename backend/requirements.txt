@@ -1,0 +1,48 @@
+# ── CORE ──────────────────────────────────────────────────────────
+fastapi==0.115.0
+starlette==0.38.6
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+pydantic[email]==2.9.2
+pydantic-settings==2.5.2
+
+# ── DATABASE ──────────────────────────────────────────────────────
+sqlalchemy==2.0.35
+aiosqlite==0.20.0          # SQLite async driver (local dev, zero setup)
+asyncpg==0.29.0            # PostgreSQL async driver (production/Docker)
+alembic==1.13.3
+
+# ── AUTH ──────────────────────────────────────────────────────────
+python-jose[cryptography]==3.3.0
+bcrypt==4.2.0
+
+# ── AI / HTTP CLIENT ──────────────────────────────────────────────
+httpx==0.27.2              # All HuggingFace API calls go through httpx
+
+# ── VECTOR DATABASE (optional) ────────────────────────────────────
+qdrant-client==1.11.3
+sentence-transformers==3.1.1
+
+# ── STORAGE (optional) ────────────────────────────────────────────
+cloudinary==1.41.0
+python-magic==0.4.27
+
+# ── TTS / VOICE (optional) ────────────────────────────────────────
+#openai-whisper==20231117
+edge-tts==6.1.12
+
+# ── CACHE (optional) ──────────────────────────────────────────────
+redis==5.1.0
+hiredis==3.0.0
+
+# ── IMAGE PROCESSING ──────────────────────────────────────────────
+Pillow==10.4.0
+
+# ── UTILITIES ─────────────────────────────────────────────────────
+python-dotenv==1.0.1
+tenacity==9.0.0
+aiofiles==24.1.0
+
+# ── DATA PROCESSING ───────────────────────────────────────────────
+pandas==2.2.3
+requests==2.32.3
