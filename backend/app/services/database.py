@@ -15,7 +15,7 @@ engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
     poolclass=StaticPool if _is_sqlite else NullPool,
-    connect_args={"check_same_thread": False} if _is_sqlite else {"ssl": "require"},
+    connect_args={"ssl": "require"} if not _is_sqlite else {"check_same_thread": False},
     future=True,
 )
 
