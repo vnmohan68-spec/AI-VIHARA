@@ -14,7 +14,7 @@ engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
     poolclass=StaticPool if _is_sqlite else NullPool,
-    connect_args={"check_same_thread": False} if _is_sqlite else {},
+    connect_args={"check_same_thread": False} if _is_sqlite else {"prepared_statement_cache_size":0},
     future=True,
 )
 
