@@ -30,14 +30,9 @@ async def lifespan(app: FastAPI):
     hf_ok   = bool(settings.HUGGINGFACE_API_TOKEN and settings.HUGGINGFACE_API_TOKEN.startswith("hf_"))
 
     logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    logger.info("  Groq  (Chat/Planner/Voice): %s", "✅ ACTIVE" if groq_ok else "❌ MISSING — add GROQ_API_KEY to .env")
-    logger.info("  HF    (Scanner/Vision):     %s", "✅ ACTIVE" if hf_ok   else "❌ MISSING — add HUGGINGFACE_API_TOKEN to .env")
+    logger.info("  Groq  (Chat/Planner/Voice): %s", "✅ ACTIVE" if groq_ok else "❌ MISSING")
+    logger.info("  HF    (Scanner/Vision):     %s", "✅ ACTIVE" if hf_ok   else "❌ MISSING")
     logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    if not groq_ok:
-        logger.info("  Get Groq key free: https://console.groq.com")
-    if not hf_ok:
-        logger.info("  Get HF token free: https://huggingface.co/settings/tokens")
-        logger.info("  Accept vision license: https://huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct")
     logger.info("✅ API ready → http://localhost:8000/api/docs")
     yield
     logger.info("🔻 Shutting down")
@@ -51,9 +46,14 @@ app = FastAPI(
     redoc_url="/api/redoc",
 )
 
-app.add_middleware(CORSMiddleware,
+app.add_middleware(
+    CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
-    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(LoggingMiddleware)
 app.add_middleware(RateLimitMiddleware)
@@ -75,25 +75,16 @@ async def health():
 
 @app.get("/api/v1/status")
 async def status():
-    """Check which features are active — open in browser to debug."""
     groq_ok = bool(settings.GROQ_API_KEY and settings.GROQ_API_KEY.startswith("gsk_"))
     hf_ok   = bool(settings.HUGGINGFACE_API_TOKEN and settings.HUGGINGFACE_API_TOKEN.startswith("hf_"))
     return {
-        "groq":  "✅ active — Chat, Planner, Voice working" if groq_ok
-                 else "❌ missing — add GROQ_API_KEY to backend/.env  →  console.groq.com",
-        "hf":    "✅ active — Scanner working" if hf_ok
-                 else "❌ missing — add HUGGINGFACE_API_TOKEN to backend/.env  →  huggingface.co/settings/tokens",
-        "scanner_note": "Also accept HF model license at: huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct",
+        "groq": "✅ active" if groq_ok else "❌ missing — add GROQ_API_KEY",
+        "hf":   "✅ active" if hf_ok   else "❌ missing — add HUGGINGFACE_API_TOKEN",
     }
 
 
-# ── Public config endpoint (safe keys only) ──────────────────────
-from fastapi import Request as _Request
-
 @app.get("/api/v1/config")
 async def public_config():
-    """Returns non-secret config values the frontend needs."""
-    from app.config.settings import settings
     return {
         "google_maps_key": settings.GOOGLE_MAPS_API_KEY or "",
         "has_weather":     bool(settings.OPENWEATHER_API_KEY),
