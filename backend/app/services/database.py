@@ -3,6 +3,7 @@ from sqlalchemy.pool import NullPool, StaticPool
 from app.config.settings import settings
 from app.models.models import Base
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -11,10 +12,10 @@ _is_sqlite = settings.DATABASE_URL.startswith("sqlite")
 # SQLite needs StaticPool (single connection, thread-safe for async)
 # PostgreSQL uses NullPool (no connection pool overhead)
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    _db_url,
     echo=settings.DEBUG,
     poolclass=StaticPool if _is_sqlite else NullPool,
-    connect_args={"check_same_thread": False} if _is_sqlite else {"prepared_statement_cache_size":0},
+    connect_args={"check_same_thread": False} if _is_sqlite else {"ssl": "require"},
     future=True,
 )
 
