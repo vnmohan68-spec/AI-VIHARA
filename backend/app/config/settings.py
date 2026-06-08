@@ -11,10 +11,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
 
     ALLOWED_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "https://vihara-ai.vercel.app",
-    ]
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://vihara-ai.vercel.app",
+    "https://ai-vihara.vercel.app",
+]
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./vihara.db"
     QDRANT_URL: str = "http://localhost:6333"
