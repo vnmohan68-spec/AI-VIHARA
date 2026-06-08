@@ -12,7 +12,7 @@ _is_sqlite = settings.DATABASE_URL.startswith("sqlite")
 # SQLite needs StaticPool (single connection, thread-safe for async)
 # PostgreSQL uses NullPool (no connection pool overhead)
 engine = create_async_engine(
-settings.DATABASE_URL,
+    settings.DATABASE_URL,
     echo=settings.DEBUG,
     poolclass=StaticPool if _is_sqlite else NullPool,
     connect_args={"check_same_thread": False} if _is_sqlite else {"ssl": "require"},
