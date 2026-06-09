@@ -9,7 +9,6 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-this-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
-
     ALLOWED_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:5173",
@@ -17,7 +16,6 @@ class Settings(BaseSettings):
         "https://ai-vihara.vercel.app",
         "https://ai-vihara-qxireyw3s-vnmohan68-specs-projects.vercel.app",
     ]
-
     DATABASE_URL: str = "sqlite+aiosqlite:///./vihara.db"
     QDRANT_URL: str = "http://localhost:6333"
     QDRANT_API_KEY: str = ""
@@ -25,10 +23,8 @@ class Settings(BaseSettings):
     VECTOR_COLLECTION_GEMS: str = "hidden_gems"
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_DIM: int = 384
-
     GROQ_API_KEY: str = ""
     HUGGINGFACE_API_TOKEN: str = ""
-
     CLOUDINARY_CLOUD_NAME: str = ""
     CLOUDINARY_API_KEY: str = ""
     CLOUDINARY_API_SECRET: str = ""
@@ -45,10 +41,10 @@ class Settings(BaseSettings):
             return False
         return v
 
-   class Config:
-    env_file = ".env"
-    case_sensitive = True
-    extra = "ignore"
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+        extra = "ignore"
 
 
 settings = Settings()
