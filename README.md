@@ -1,12 +1,12 @@
 ---
-title: Vihara AI
+title: Ai Vihara
 emoji: 🏛️
 colorFrom: yellow
-colorTo: orange
+colorTo: blue
 sdk: docker
 pinned: false
 ---
 
-# Vihara AI — Cultural Intelligence Platform
+# AI Vihara
 
-Discover India's heritage through AI-powered monument recognition, guided tours, and cultural insights.
+An AI-powered travel and cultural experience app.
