@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import logging
+import os
 
 from app.config.settings import settings
 from app.middleware.logging import LoggingMiddleware, RateLimitMiddleware
@@ -30,10 +33,10 @@ async def lifespan(app: FastAPI):
     hf_ok   = bool(settings.HUGGINGFACE_API_TOKEN and settings.HUGGINGFACE_API_TOKEN.startswith("hf_"))
 
     logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    logger.info("  Groq  (Chat/Planner/Voice): %s", "✅ ACTIVE" if groq_ok else "❌ MISSING")
-    logger.info("  HF    (Scanner/Vision):     %s", "✅ ACTIVE" if hf_ok   else "❌ MISSING")
+    logger.info("  Groq  (Chat/Planner/Voice): %s", "✅ ACTIVE" if groq_ok else "❌ MISSING — add GROQ_API_KEY to .env")
+    logger.info("  HF    (Scanner/Vision):     %s", "✅ ACTIVE" if hf_ok   else "❌ MISSING — add HUGGINGFACE_API_TOKEN to .env")
     logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    logger.info("✅ API ready → http://localhost:8000/api/docs")
+    logger.info("✅ API ready")
     yield
     logger.info("🔻 Shutting down")
 
@@ -46,14 +49,9 @@ app = FastAPI(
     redoc_url="/api/redoc",
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
-    allow_origin_regex=r"https://.*\.vercel\.app",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(LoggingMiddleware)
 app.add_middleware(RateLimitMiddleware)
@@ -78,8 +76,8 @@ async def status():
     groq_ok = bool(settings.GROQ_API_KEY and settings.GROQ_API_KEY.startswith("gsk_"))
     hf_ok   = bool(settings.HUGGINGFACE_API_TOKEN and settings.HUGGINGFACE_API_TOKEN.startswith("hf_"))
     return {
-        "groq": "✅ active" if groq_ok else "❌ missing — add GROQ_API_KEY",
-        "hf":   "✅ active" if hf_ok   else "❌ missing — add HUGGINGFACE_API_TOKEN",
+        "groq":  "✅ active" if groq_ok else "❌ missing GROQ_API_KEY",
+        "hf":    "✅ active" if hf_ok   else "❌ missing HUGGINGFACE_API_TOKEN",
     }
 
 
@@ -90,3 +88,15 @@ async def public_config():
         "has_weather":     bool(settings.OPENWEATHER_API_KEY),
         "has_groq":        bool(settings.GROQ_API_KEY and settings.GROQ_API_KEY.startswith("gsk_")),
     }
+
+
+# ── Serve React frontend (must be LAST) ──────────────────────────
+DIST = os.path.join(os.path.dirname(__file__), "dist")
+
+if os.path.exists(DIST):
+    app.mount("/assets", StaticFiles(directory=os.path.join(DIST, "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        index = os.path.join(DIST, "index.html")
+        return FileResponse(index)
